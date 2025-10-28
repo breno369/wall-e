@@ -1,6 +1,7 @@
 const uint8_t CMD_MAX = 32;
 char cmdBuf[CMD_MAX];
 uint8_t idx = 0;
+int led = 0;
 
 class DCMotor {
   int spd = 255, out1 = LOW, out2 = LOW, pin1, pin2, pin3;
@@ -38,11 +39,42 @@ public:
   }
 };
 
+class LedsControl {
+  int led_stateR = 0, led_stateG = 0, led_stateB = 0, ledR, ledG, ledB;
+
+public:
+  void Pinout(int pin1, int pin2, int pin3) {
+    ledR = pin1;
+    ledG = pin2;
+    ledB = pin3;
+    pinMode(ledR, OUTPUT);
+    pinMode(ledG, OUTPUT);
+    pinMode(ledB, OUTPUT);
+  }
+  void Red(int led_state) {
+    led_stateR = led_state;
+  }
+  void Green(int led_state) {
+    led_stateG = led_state;
+  }
+  void Blue(int led_state) {
+    led_stateB = led_state;
+  }
+  void Read() {
+    digitalWrite(ledR, led_stateR);
+    digitalWrite(ledG, led_stateG);
+    digitalWrite(ledB, led_stateB);
+  }
+};
+
 DCMotor Motor1, Motor2;
+LedsControl Led;
 
 void setup() {
   Motor1.Pinout(8, 7, 5);
   Motor2.Pinout(9, 4, 6);
+
+  Led.Pinnout(15, 16, 17);
 
   Serial.begin(9600);
   Serial3.begin(9600);
@@ -98,6 +130,13 @@ void loop() {
               Motor1.Backward();
               Motor2.Backward();
               break;
+            case 'X':
+              Serial.println(F("X pressionado"));
+              led ++;
+              if (led > 6) {
+                led = 0;
+              } 
+              break;
             default:
               Serial.println(F("nada pressionado"));
               break;
@@ -109,9 +148,54 @@ void loop() {
     }
   }
 
+  switch (led) {
+    case 1:
+      Led.Red(1);
+      Led.Green(0);
+      Led.Blue(0);
+      break;
+    case 2:
+      Led.Red(0);
+      Led.Green(1);
+      Led.Blue(0);
+      break;
+    case 3:
+      Led.Red(0);
+      Led.Green(0);
+      Led.Blue(1);
+      break;
+    case 4:
+      Led.Red(0);
+      Led.Green(0);
+      Led.Blue(0);
+      break;
+    case 5:
+      Led.Red(0);
+      Led.Green(0);
+      Led.Blue(0);
+      break;
+    case 6:
+      Led.Red(0);
+      Led.Green(0);
+      Led.Blue(0);
+      break;
+    default:
+      Led.Red(0);
+      Led.Green(0);
+      Led.Blue(0);
+      break;
+  }
+
   Motor1.Read();
   Motor2.Read();
 }
+
+// 1 red
+// 2 green
+// 3 blue
+// 4 
+// 5
+// 6
 
 // if (Serial3.available()) {
 //   c = Serial3.read();
